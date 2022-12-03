@@ -1,0 +1,4 @@
+/Photos/
+*.pyc
+*.csv
+/.idea/
