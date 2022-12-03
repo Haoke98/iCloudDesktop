@@ -3,6 +3,21 @@
     <img width="300" src="assets/41166dada6559cb93c7a4ff0ea681e52.png">
 </p>
 
+## Usage
+```shell
+Usage: icloud.py <options>
+
+Options:
+  -d, --directory <directory>  Local directory that should be used for
+                               download
+  -u, --username <username>    Your iCloud username or email address
+  -p, --password <password>    Your iCloud password (default: use PyiCloud
+                               keyring or prompt for password)
+  --recent INTEGER RANGE       Number of recent photos to download (default:
+                               download all photos)  [x>=0]
+  --version                    Show the version and exit.
+  -h, --help                   Show this message and exit.
+```
 ## <img width="50" src="assets/1c11f0fa22d4e93f8dc179b8ff84791d.png"> Photos Download
 ```shell
 icloud -d /external/SADAM/icloud/photos/ --recent 500
