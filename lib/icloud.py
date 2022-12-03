@@ -32,7 +32,7 @@ class IcloudService(__iCloudService__):
 
     def two_factor_authenticate(self):
         if self.requires_2fa:
-            logging.info("Two-factor authentication required.")
+            logging.warning("Two-factor authentication required.")
             code = input("Enter the code you received of one of your approved devices: ")
             result = self.validate_2fa_code(code)
             logging.info("Code validation result: %s" % result)

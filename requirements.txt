@@ -1,1 +1,2 @@
 pyicloud==1.0.0
+colorlog==6.6.0
