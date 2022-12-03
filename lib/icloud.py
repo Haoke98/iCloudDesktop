@@ -16,6 +16,8 @@ from pyicloud import PyiCloudService as __iCloudService__
 
 
 class IcloudService(__iCloudService__):
+    HOME_ENDPOINT = "https://www.icloud.com.cn"
+    SETUP_ENDPOINT = "https://setup.icloud.com.cn/setup/ws/1"
 
     def __init__(self, apple_id,
                  password=None,

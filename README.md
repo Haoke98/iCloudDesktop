@@ -4,7 +4,13 @@
 </p>
 
 ## <img width="50" src="assets/1c11f0fa22d4e93f8dc179b8ff84791d.png"> Photos Download
+```shell
+icloud -d /external/SADAM/icloud/photos/ --recent 500
+```
 
+```shell
+icloud -u <username> -p <password> -d /external/SADAM/icloud/photos/ --recent 500
+```
 
 
 ## <img width="50" src="assets/dccb81ba3f0f63e9a50c162007f59c4a.png"> Driver (Files)
