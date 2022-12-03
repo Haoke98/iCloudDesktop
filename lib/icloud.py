@@ -92,19 +92,25 @@ class IcloudService(__iCloudService__):
                 'create table photos(id varchar(255) primary key, created timestamp , asset_date timestamp , added_date timestamp ,filename varchar(255), size integer, dimension_x integer, dimension_y integer )')
         except Exception as e:
             logging.info(e)
-        c = con.cursor()
         _all = iter(self.photos.all)
         for i in range(1, recent + 1):
             photo = next(_all, None)
-            res = c.execute(
+            con.execute(
                 'INSERT OR IGNORE INTO photos(id, created, asset_date, added_date, filename,size,dimension_x,dimension_y) values (?,?,?,?,?,?,?,?)',
                 (photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size,
                  photo.dimensions[0], photo.dimensions[1]))
-
-            raw_path = os.path.join(outputDir, photo.filename)
+            _ext_ = str(photo.filename).split(".")[1]
+            _file_name_ = f"{photo.id.replace('/', '-')}.{_ext_}"
+            raw_path = os.path.join(outputDir, _file_name_)
             if os.path.exists(raw_path):
                 statinfo = os.stat(raw_path)
-                if statinfo.st_size != photo.size:
+                if photo.size > statinfo.st_size:
+                    logging.warning(f"文件[{raw_path}]已损坏,正在重新下载....")
+                    __download__()
+                    logging.warning(f"文件[{raw_path}]重新下载成功.")
+                elif photo.size < statinfo.st_size:
+                    # cur = con.execute(f"SELECT id FROM photos WHERE filename='{photo.filename}'")
+                    # values = cur.fetchall()
                     # 文件名一样
                     raise Exception(
                         f"出现了同名文件[{photo.filename}],\n 已有文件：[{statinfo}], \n即将下载的文件：[{photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size, photo.dimensions}]")
@@ -113,7 +119,7 @@ class IcloudService(__iCloudService__):
                         __modify_create_date__()
             else:
                 __download__()
+            con.commit()
+            logging.info(f"%0.2f%% ({i}/{recent}):{photo.id}, {photo.filename}, {raw_path}" % (i / recent * 100))
             if auto_delete:
                 photo.delete()
-            con.commit()
-            logging.info(f"%0.2f%% ({i}/{recent}):{photo.filename}" % (i / recent * 100))
