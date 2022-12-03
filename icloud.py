@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # _*_ codign:utf8 _*_
 """====================================
 @Author:Sadam·Sadik
