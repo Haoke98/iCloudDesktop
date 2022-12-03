@@ -32,30 +32,31 @@ class IcloudService(__iCloudService__):
 
     def two_factor_authenticate(self):
         if self.requires_2fa:
-            print("Two-factor authentication required.")
+            logging.info("Two-factor authentication required.")
             code = input("Enter the code you received of one of your approved devices: ")
             result = self.validate_2fa_code(code)
-            print("Code validation result: %s" % result)
+            logging.info("Code validation result: %s" % result)
 
             if not result:
-                print("Failed to verify security code")
+                logging.error("Failed to verify security code")
                 sys.exit(1)
 
             if not self.is_trusted_session:
-                print("Session is not trusted. Requesting trust...")
+                logging.warning("Session is not trusted. Requesting trust...")
                 result = self.trust_session()
-                print("Session trust result %s" % result)
+                logging.info("Session trust result %s" % result)
 
                 if not result:
-                    print("Failed to request trust. You will likely be prompted for the code again in the coming weeks")
+                    logging.error(
+                        "Failed to request trust. You will likely be prompted for the code again in the coming weeks")
         elif self.requires_2sa:
             import click
 
-            print("Two-step authentication required. Your trusted devices are:")
+            logging.info("Two-step authentication required. Your trusted devices are:")
 
             devices = self.trusted_devices
             for i, device in enumerate(devices):
-                print(
+                logging.info(
                     "  %s: %s" % (i, device.get('deviceName',
                                                 "SMS to %s" % device.get('phoneNumber')))
                 )
@@ -63,12 +64,12 @@ class IcloudService(__iCloudService__):
             device = click.prompt('Which device would you like to use?', default=0)
             device = devices[device]
             if not self.send_verification_code(device):
-                print("Failed to send verification code")
+                logging.error("Failed to send verification code")
                 sys.exit(1)
 
             code = click.prompt('Please enter validation code')
             if not self.validate_verification_code(device, code):
-                print("Failed to verify verification code")
+                logging.info("Failed to verify verification code")
                 sys.exit(1)
 
     def download_photo(self, outputDir: str = "./Photos", recent: int = 10, auto_delete: bool = False,
@@ -95,10 +96,10 @@ class IcloudService(__iCloudService__):
         _all = iter(self.photos.all)
         for i in range(1, recent + 1):
             photo = next(_all, None)
-            res = c.execute("""INSERT INTO photos(id, created, asset_date, added_date, filename,size,dimension_x,dimension_y) values (?,?,?,?,?,?,?,?)
-                            ON CONFLICT (id) DO NOTHING""",
-                            (photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size,
-                             photo.dimensions[0], photo.dimensions[1]))
+            res = c.execute(
+                'INSERT OR IGNORE INTO photos(id, created, asset_date, added_date, filename,size,dimension_x,dimension_y) values (?,?,?,?,?,?,?,?)',
+                (photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size,
+                 photo.dimensions[0], photo.dimensions[1]))
 
             raw_path = os.path.join(outputDir, photo.filename)
             if os.path.exists(raw_path):
@@ -106,7 +107,7 @@ class IcloudService(__iCloudService__):
                 if statinfo.st_size != photo.size:
                     # 文件名一样
                     raise Exception(
-                        f"出现了同名文件[{photo.filename}],\n 已有文件：[{statinfo}], \n即将下载的文件：[{photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size, photo.dimensions[0], photo.dimensions[1]}]")
+                        f"出现了同名文件[{photo.filename}],\n 已有文件：[{statinfo}], \n即将下载的文件：[{photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size, photo.dimensions}]")
                 else:
                     if modify_olds:
                         __modify_create_date__()
@@ -115,4 +116,4 @@ class IcloudService(__iCloudService__):
             if auto_delete:
                 photo.delete()
             con.commit()
-            print(f"%0.2f%% ({i}/{recent}):{photo.filename}" % (i / recent * 100))
+            logging.info(f"%0.2f%% ({i}/{recent}):{photo.filename}" % (i / recent * 100))

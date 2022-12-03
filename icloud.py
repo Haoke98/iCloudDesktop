@@ -7,9 +7,11 @@
 @Software: PyCharm
 @disc:
 ======================================="""
+import logging
+
 import click
 
-from lib import icloud
+from lib import icloud, logger
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
@@ -58,10 +60,14 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 # pylint: disable-msg=too-many-branches,too-many-locals
 def main(username, password, china_account, directory, recent, auto_delete, modify_olds):
     iService = icloud.IcloudService(username, password, china_account)
-    print("AUTO_DELETE:", auto_delete)
-    print("MODIFY_OLDS:", modify_olds)
+    logging.info(f"CHINA_ACCOUNT:{china_account}")
+    logging.info(f"PHOTO DOWNLOAD DIRECTORY:[{directory}]")
+    logging.info(f"RECENT:{recent}")
+    logging.info(f"AUTO_DELETE: {auto_delete}")
+    logging.info(f"MODIFY_OLDS: {modify_olds}")
     iService.download_photo(directory, recent=recent, modify_olds=modify_olds, auto_delete=auto_delete)
 
 
 if __name__ == "__main__":
+    logger.init("icloud")
     main()
