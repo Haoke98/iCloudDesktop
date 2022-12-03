@@ -16,15 +16,17 @@ from pyicloud import PyiCloudService as __iCloudService__
 
 
 class IcloudService(__iCloudService__):
-    HOME_ENDPOINT = "https://www.icloud.com.cn"
-    SETUP_ENDPOINT = "https://setup.icloud.com.cn/setup/ws/1"
 
     def __init__(self, apple_id,
                  password=None,
+                 china_account=None,
                  cookie_directory=None,
                  verify=True,
                  client_id=None,
                  with_family=True, ):
+        if china_account:
+            self.HOME_ENDPOINT = "https://www.icloud.com.cn"
+            self.SETUP_ENDPOINT = "https://setup.icloud.com.cn/setup/ws/1"
         super().__init__(apple_id, password, cookie_directory, verify, client_id, with_family)
         self.two_factor_authenticate()
 

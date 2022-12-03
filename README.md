@@ -11,6 +11,9 @@ Options:
   -u, --username <username>    Your iCloud username or email address
   -p, --password <password>    Your iCloud password (default: use PyiCloud
                                keyring or prompt for password)
+  --china-account              Specify the "HOME_ENDPOINT" and
+                               "SETUP_ENDPOINT" for the "China Mainland
+                               Accounts".
   -d, --directory <directory>  Local directory that should be used for
                                download
   --recent INTEGER RANGE       Number of recent photos to download (default:

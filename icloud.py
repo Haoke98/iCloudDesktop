@@ -28,6 +28,11 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
     metavar="<password>",
 )
 @click.option(
+    "--china-account",
+    help='Specify the "HOME_ENDPOINT" and "SETUP_ENDPOINT" for the "China Mainland Accounts". ',
+    is_flag=True,
+)
+@click.option(
     "-d", "--directory",
     help="Local directory that should be used for download",
     type=click.Path(exists=True),
@@ -51,8 +56,8 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.version_option()
 # pylint: disable-msg=too-many-arguments,too-many-statements
 # pylint: disable-msg=too-many-branches,too-many-locals
-def main(username, password, directory, recent, auto_delete, modify_olds):
-    iService = icloud.IcloudService(username, password)
+def main(username, password, china_account, directory, recent, auto_delete, modify_olds):
+    iService = icloud.IcloudService(username, password, china_account)
     print("AUTO_DELETE:", auto_delete)
     print("MODIFY_OLDS:", modify_olds)
     iService.download_photo(directory, recent=recent, modify_olds=modify_olds, auto_delete=auto_delete)
