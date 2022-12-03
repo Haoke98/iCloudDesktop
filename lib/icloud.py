@@ -107,7 +107,7 @@ class IcloudService(__iCloudService__):
                 if photo.size > statinfo.st_size:
                     logging.warning(f"文件[{raw_path}]已损坏,正在重新下载....")
                     __download__()
-                    logging.warning(f"文件[{raw_path}]重新下载成功.")
+                    logging.info(f"文件[{raw_path}]重新下载成功.")
                 elif photo.size < statinfo.st_size:
                     # cur = con.execute(f"SELECT id FROM photos WHERE filename='{photo.filename}'")
                     # values = cur.fetchall()

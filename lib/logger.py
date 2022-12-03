@@ -59,8 +59,7 @@ class Logger:
         if not os.path.exists(LOG_DIR):
             os.makedirs(LOG_DIR)
         n = datetime.datetime.now()
-        logFilePath = os.path.join(LOG_DIR,
-                                   f"{name}-{str(n.year).zfill(4)}{str(n.month).zfill(2)}{n.day}{str(n.hour).zfill(2)}{str(n.minute).zfill(2)}{str(n.second).zfill(2)}.log")
+        logFilePath = os.path.join(LOG_DIR, f"{name}-{n.strftime('%Y%m%d%H%M')}.log")
         print("日志输出文件：", logFilePath)
         # 获取logger对象
         self.logger = logging.getLogger(logFilePath)
