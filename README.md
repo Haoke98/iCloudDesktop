@@ -8,13 +8,18 @@
 Usage: icloud.py <options>
 
 Options:
-  -d, --directory <directory>  Local directory that should be used for
-                               download
   -u, --username <username>    Your iCloud username or email address
   -p, --password <password>    Your iCloud password (default: use PyiCloud
                                keyring or prompt for password)
+  -d, --directory <directory>  Local directory that should be used for
+                               download
   --recent INTEGER RANGE       Number of recent photos to download (default:
                                download all photos)  [x>=0]
+  --auto-delete                Scans the "Recently Deleted" folder and deletes
+                               any files found in there. (If you restore the
+                               photo in iCloud, it will be downloaded again.)
+  --modify-olds                Modify the "Created Time" of the old files that
+                               already been in the folder.
   --version                    Show the version and exit.
   -h, --help                   Show this message and exit.
 ```

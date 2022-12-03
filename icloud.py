@@ -15,12 +15,6 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 @click.command(context_settings=CONTEXT_SETTINGS, options_metavar="<options>")
-# @click.argument(
-@click.option(
-    "-d", "--directory",
-    help="Local directory that should be used for download",
-    type=click.Path(exists=True),
-    metavar="<directory>")
 @click.option(
     "-u", "--username",
     help="Your iCloud username or email address",
@@ -34,16 +28,34 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
     metavar="<password>",
 )
 @click.option(
+    "-d", "--directory",
+    help="Local directory that should be used for download",
+    type=click.Path(exists=True),
+    metavar="<directory>")
+@click.option(
     "--recent",
     help="Number of recent photos to download (default: download all photos)",
     type=click.IntRange(0),
 )
+@click.option(
+    "--auto-delete",
+    help='Scans the "Recently Deleted" folder and deletes any files found in there. '
+         + "(If you restore the photo in iCloud, it will be downloaded again.)",
+    is_flag=True,
+)
+@click.option(
+    "--modify-olds",
+    help='Modify the "Created Time" of the old files that already been in the folder.',
+    is_flag=True,
+)
 @click.version_option()
 # pylint: disable-msg=too-many-arguments,too-many-statements
 # pylint: disable-msg=too-many-branches,too-many-locals
-def main(username, password, directory, recent):
+def main(username, password, directory, recent, auto_delete, modify_olds):
     iService = icloud.IcloudService(username, password)
-    iService.download_photo(directory, recent=recent, modify_olds=True)
+    print("AUTO_DELETE:", auto_delete)
+    print("MODIFY_OLDS:", modify_olds)
+    iService.download_photo(directory, recent=recent, modify_olds=modify_olds, auto_delete=auto_delete)
 
 
 if __name__ == "__main__":
