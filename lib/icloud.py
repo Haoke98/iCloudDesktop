@@ -10,12 +10,15 @@ import logging
 import os
 import sqlite3
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from subprocess import call
 
 from pyicloud import PyiCloudService as __iCloudService__
+from pyicloud.services.photos import PhotoAsset
 
 
 class IcloudService(__iCloudService__):
+    COMPLETED_OF_DOWNLOAD_PHOTO = 0
 
     def __init__(self, apple_id,
                  password=None,
@@ -72,8 +75,9 @@ class IcloudService(__iCloudService__):
                 logging.info("Failed to verify verification code")
                 sys.exit(1)
 
-    def download_photo(self, outputDir: str = "./Photos", recent: int = 10, auto_delete: bool = False,
-                       modify_olds: bool = False):
+    def handle(self, outputDir: str, recent: int, photo: PhotoAsset, modify_olds: bool, auto_delete: bool):
+        logging.info(f"开始了{photo}")
+
         def __modify_create_date__():
             createdTimeStr = photo.created.strftime("%m/%d/%Y %H:%M:%S")
             command = f'SetFile -d "{createdTimeStr}" {raw_path}'
@@ -83,43 +87,58 @@ class IcloudService(__iCloudService__):
             download = photo.download()
             with open(raw_path, 'wb') as opened_file:
                 opened_file.write(download.raw.read())
+            __modify_create_date__()
+
+        con = sqlite3.connect(os.path.join(outputDir, 'info.db'))
+        con.execute(
+            'INSERT OR IGNORE INTO photos(id, created, asset_date, added_date, filename,size,dimension_x,dimension_y) values (?,?,?,?,?,?,?,?)',
+            (photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size,
+             photo.dimensions[0], photo.dimensions[1]))
+        _ext_ = str(photo.filename).split(".")[1]
+        _file_name_ = f"{photo.id.replace('/', '-')}.{_ext_}"
+        raw_path = os.path.join(outputDir, _file_name_)
+        if os.path.exists(raw_path):
+            statinfo = os.stat(raw_path)
+            if photo.size > statinfo.st_size:
+                logging.warning(f"文件[{raw_path}]已损坏,正在重新下载....")
+                __download__()
+                logging.info(f"文件[{raw_path}]重新下载成功.")
+            elif photo.size < statinfo.st_size:
+                # 文件名一样
+                raise Exception(
+                    f"出现了同名文件[{photo.filename}],\n 已有文件：[{statinfo}], \n即将下载的文件：[{photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size, photo.dimensions}]")
+            else:
+                if modify_olds:
+                    __modify_create_date__()
+        else:
+            __download__()
+        con.commit()
+        con.close()
+        self.COMPLETED_OF_DOWNLOAD_PHOTO += 1
+        logging.info(
+            f"%0.2f%% ({self.COMPLETED_OF_DOWNLOAD_PHOTO}/{recent}):{photo.id}, {photo.filename}, {raw_path}" % (
+                    self.COMPLETED_OF_DOWNLOAD_PHOTO / recent * 100))
+        if auto_delete:
+            photo.delete()
+
+    def download_photo(self, outputDir: str = "./Photos", recent=None, auto_delete: bool = False,
+                       modify_olds: bool = False):
 
         if not os.path.exists(outputDir):
             os.makedirs(outputDir)
         con = sqlite3.connect(os.path.join(outputDir, 'info.db'))
         try:
-            resp = con.execute(
+            con.execute(
                 'create table photos(id varchar(255) primary key, created timestamp , asset_date timestamp , added_date timestamp ,filename varchar(255), size integer, dimension_x integer, dimension_y integer )')
         except Exception as e:
             logging.info(e)
+        con.close()
         _all = iter(self.photos.all)
+        logging.info(f"该账号的icloud相册里总共有{len(self.photos.all)}个媒体对象（包括视频，短视频，Live实况图，动图，JPG，JPEG，PNG...etc.)")
+        pool = ThreadPoolExecutor(max_workers=5)
+        if recent is None:
+            recent = len(self.photos.all)
         for i in range(1, recent + 1):
             photo = next(_all, None)
-            con.execute(
-                'INSERT OR IGNORE INTO photos(id, created, asset_date, added_date, filename,size,dimension_x,dimension_y) values (?,?,?,?,?,?,?,?)',
-                (photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size,
-                 photo.dimensions[0], photo.dimensions[1]))
-            _ext_ = str(photo.filename).split(".")[1]
-            _file_name_ = f"{photo.id.replace('/', '-')}.{_ext_}"
-            raw_path = os.path.join(outputDir, _file_name_)
-            if os.path.exists(raw_path):
-                statinfo = os.stat(raw_path)
-                if photo.size > statinfo.st_size:
-                    logging.warning(f"文件[{raw_path}]已损坏,正在重新下载....")
-                    __download__()
-                    logging.info(f"文件[{raw_path}]重新下载成功.")
-                elif photo.size < statinfo.st_size:
-                    # cur = con.execute(f"SELECT id FROM photos WHERE filename='{photo.filename}'")
-                    # values = cur.fetchall()
-                    # 文件名一样
-                    raise Exception(
-                        f"出现了同名文件[{photo.filename}],\n 已有文件：[{statinfo}], \n即将下载的文件：[{photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size, photo.dimensions}]")
-                else:
-                    if modify_olds:
-                        __modify_create_date__()
-            else:
-                __download__()
-            con.commit()
-            logging.info(f"%0.2f%% ({i}/{recent}):{photo.id}, {photo.filename}, {raw_path}" % (i / recent * 100))
-            if auto_delete:
-                photo.delete()
+            pool.submit(IcloudService.handle, self, outputDir, recent, photo, modify_olds, auto_delete)
+        pool.shutdown(wait=True)
