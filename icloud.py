@@ -55,17 +55,23 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
     help='Modify the "Created Time" of the old files that already been in the folder.',
     is_flag=True,
 )
+@click.option(
+    "--workers",
+    help="Number of the thread to download photo.(Default is 3)",
+    type=click.IntRange(1),
+)
 @click.version_option()
 # pylint: disable-msg=too-many-arguments,too-many-statements
 # pylint: disable-msg=too-many-branches,too-many-locals
-def main(username, password, china_account, directory, recent, auto_delete, modify_olds):
+def main(username, password, china_account, directory, recent, auto_delete, modify_olds, max_thread_count):
     iService = icloud.IcloudService(username, password, china_account)
     logging.info(f"CHINA_ACCOUNT:{china_account}")
     logging.info(f"PHOTO DOWNLOAD DIRECTORY:[{directory}]")
     logging.info(f"RECENT:{recent}")
     logging.info(f"AUTO_DELETE: {auto_delete}")
     logging.info(f"MODIFY_OLDS: {modify_olds}")
-    iService.download_photo(directory, recent=recent, modify_olds=modify_olds, auto_delete=auto_delete)
+    iService.download_photo(directory, recent=recent, modify_olds=modify_olds, auto_delete=auto_delete,
+                            max_thread_count=max_thread_count)
 
 
 if __name__ == "__main__":

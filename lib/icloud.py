@@ -8,11 +8,11 @@
 ======================================="""
 import logging
 import os
+import platform
 import sqlite3
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from subprocess import call
-import platform
 
 from pyicloud import PyiCloudService as __iCloudService__
 from pyicloud.services.photos import PhotoAsset
@@ -79,10 +79,7 @@ class IcloudService(__iCloudService__):
     def handle(self, outputDir: str, recent: int, photo: PhotoAsset, modify_olds: bool, auto_delete: bool):
 
         def __modify_create_date__():
-            if platform.system() == "Darwin":
-                createdTimeStr = photo.created.strftime("%m/%d/%Y %H:%M:%S")
-                command = f'SetFile -d "{createdTimeStr}" {raw_path}'
-            elif platform.system() == "Linux":
+            if platform.system() in ["Linux", "Darwin"]:
                 createdTimeStr = photo.created.strftime("%Y%m%d %H:%M:%S")
                 command = f'touch {raw_path} -d "{createdTimeStr}"'
             else:
@@ -129,7 +126,7 @@ class IcloudService(__iCloudService__):
             photo.delete()
 
     def download_photo(self, outputDir: str = "./Photos", recent=None, auto_delete: bool = False,
-                       modify_olds: bool = False):
+                       modify_olds: bool = False, max_thread_count: int = 3):
 
         if not os.path.exists(outputDir):
             os.makedirs(outputDir)
@@ -142,7 +139,7 @@ class IcloudService(__iCloudService__):
         con.close()
         _all = iter(self.photos.all)
         logging.info(f"该账号的icloud相册里总共有{len(self.photos.all)}个媒体对象（包括视频，短视频，Live实况图，动图，JPG，JPEG，PNG...etc.)")
-        pool = ThreadPoolExecutor(max_workers=1)
+        pool = ThreadPoolExecutor(max_workers=max_thread_count)
         if recent is None:
             recent = len(self.photos.all)
         for i in range(1, recent + 1):
