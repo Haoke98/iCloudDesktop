@@ -12,6 +12,7 @@ import sqlite3
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from subprocess import call
+import platform
 
 from pyicloud import PyiCloudService as __iCloudService__
 from pyicloud.services.photos import PhotoAsset
@@ -76,11 +77,16 @@ class IcloudService(__iCloudService__):
                 sys.exit(1)
 
     def handle(self, outputDir: str, recent: int, photo: PhotoAsset, modify_olds: bool, auto_delete: bool):
-        logging.info(f"开始了{photo}")
 
         def __modify_create_date__():
-            createdTimeStr = photo.created.strftime("%m/%d/%Y %H:%M:%S")
-            command = f'SetFile -d "{createdTimeStr}" {raw_path}'
+            if platform.system() == "Darwin":
+                createdTimeStr = photo.created.strftime("%m/%d/%Y %H:%M:%S")
+                command = f'SetFile -d "{createdTimeStr}" {raw_path}'
+            elif platform.system() == "Linux":
+                createdTimeStr = photo.created.strftime("%Y%m%d %H:%M:%S")
+                command = f'touch {raw_path} -d "{createdTimeStr}"'
+            else:
+                raise Exception("请完成Windows上的文件创建时间修改方法")
             call(command, shell=True)
 
         def __download__():
@@ -89,6 +95,7 @@ class IcloudService(__iCloudService__):
                 opened_file.write(download.raw.read())
             __modify_create_date__()
 
+        logging.info(f"开始了{photo.id}, {photo.filename}, {photo.size}")
         con = sqlite3.connect(os.path.join(outputDir, 'info.db'))
         con.execute(
             'INSERT OR IGNORE INTO photos(id, created, asset_date, added_date, filename,size,dimension_x,dimension_y) values (?,?,?,?,?,?,?,?)',
@@ -135,7 +142,7 @@ class IcloudService(__iCloudService__):
         con.close()
         _all = iter(self.photos.all)
         logging.info(f"该账号的icloud相册里总共有{len(self.photos.all)}个媒体对象（包括视频，短视频，Live实况图，动图，JPG，JPEG，PNG...etc.)")
-        pool = ThreadPoolExecutor(max_workers=5)
+        pool = ThreadPoolExecutor(max_workers=1)
         if recent is None:
             recent = len(self.photos.all)
         for i in range(1, recent + 1):
