@@ -63,7 +63,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.version_option()
 # pylint: disable-msg=too-many-arguments,too-many-statements
 # pylint: disable-msg=too-many-branches,too-many-locals
-def main(username, password, china_account, directory, recent, auto_delete, modify_olds, max_thread_count):
+def main(username, password, china_account, directory, recent, auto_delete, modify_olds, workers):
     iService = icloud.IcloudService(username, password, china_account)
     logging.info(f"CHINA_ACCOUNT:{china_account}")
     logging.info(f"PHOTO DOWNLOAD DIRECTORY:[{directory}]")
@@ -71,7 +71,7 @@ def main(username, password, china_account, directory, recent, auto_delete, modi
     logging.info(f"AUTO_DELETE: {auto_delete}")
     logging.info(f"MODIFY_OLDS: {modify_olds}")
     iService.download_photo(directory, recent=recent, modify_olds=modify_olds, auto_delete=auto_delete,
-                            max_thread_count=max_thread_count)
+                            max_thread_count=workers)
 
 
 if __name__ == "__main__":
