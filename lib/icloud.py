@@ -125,8 +125,24 @@ class IcloudService(__iCloudService__):
         if auto_delete:
             photo.delete()
 
-    def download_photo(self, outputDir: str = "./Photos", recent=None, auto_delete: bool = False,
+    def download_photo(self, outputDir: str = "./Photos", transfer_album: str = None, recent=None,
+                       auto_delete: bool = False,
                        modify_olds: bool = False, max_thread_count: int = 3):
+        def handle(album, recent):
+            _all = iter(album)
+            logging.info(f"相册[{album.name}]里总共有{len(album)}个媒体对象（包括视频，短视频，Live实况图，动图，JPG，JPEG，PNG...etc.)")
+            if recent is None:
+                recent = len(album)
+            if max_thread_count == 1:
+                for i in range(1, recent + 1):
+                    photo = next(_all, None)
+                    self.handle(outputDir, recent, photo, modify_olds, auto_delete)
+            else:
+                pool = ThreadPoolExecutor(max_workers=max_thread_count)
+                for i in range(1, recent + 1):
+                    photo = next(_all, None)
+                    pool.submit(IcloudService.handle, self, outputDir, recent, photo, modify_olds, auto_delete)
+                pool.shutdown(wait=True)
 
         if not os.path.exists(outputDir):
             os.makedirs(outputDir)
@@ -137,12 +153,7 @@ class IcloudService(__iCloudService__):
         except Exception as e:
             logging.info(e)
         con.close()
-        _all = iter(self.photos.all)
-        logging.info(f"该账号的icloud相册里总共有{len(self.photos.all)}个媒体对象（包括视频，短视频，Live实况图，动图，JPG，JPEG，PNG...etc.)")
-        pool = ThreadPoolExecutor(max_workers=max_thread_count)
-        if recent is None:
-            recent = len(self.photos.all)
-        for i in range(1, recent + 1):
-            photo = next(_all, None)
-            pool.submit(IcloudService.handle, self, outputDir, recent, photo, modify_olds, auto_delete)
-        pool.shutdown(wait=True)
+        if transfer_album is None:
+            handle(self.photos.all, recent)
+        else:
+            handle(self.photos.albums.get(transfer_album), recent)

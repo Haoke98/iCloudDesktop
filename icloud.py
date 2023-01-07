@@ -13,27 +13,37 @@ import click
 
 from lib import icloud, logger
 
-CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
+iService = None
 
 
-@click.command(context_settings=CONTEXT_SETTINGS, options_metavar="<options>")
+@click.group()
 @click.option(
     "-u", "--username",
     help="Your iCloud username or email address",
     metavar="<username>",
     prompt="iCloud username/email",
+    required=True
 )
 @click.option(
     "-p", "--password",
     help="Your iCloud password "
          "(default: use PyiCloud keyring or prompt for password)",
     metavar="<password>",
+    required=True
 )
 @click.option(
     "--china-account",
     help='Specify the "HOME_ENDPOINT" and "SETUP_ENDPOINT" for the "China Mainland Accounts". ',
     is_flag=True,
 )
+@click.version_option()
+def main(username, password, china_account):
+    global iService
+    logging.info(f"CHINA_ACCOUNT:{china_account}")
+    iService = icloud.IcloudService(username, password, china_account)
+
+
+@main.command(options_metavar="<options>")
 @click.option(
     "-d", "--directory",
     help="Local directory that should be used for download",
@@ -60,17 +70,21 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
     help="Number of the thread to download photo.(Default is 3)",
     type=click.IntRange(1),
 )
-@click.version_option()
+@click.option(
+    "--transfer-album",
+    help="Determine the album that will be downloaded.",
+    metavar="<album_name>"
+)
 # pylint: disable-msg=too-many-arguments,too-many-statements
 # pylint: disable-msg=too-many-branches,too-many-locals
-def main(username, password, china_account, directory, recent, auto_delete, modify_olds, workers):
-    iService = icloud.IcloudService(username, password, china_account)
-    logging.info(f"CHINA_ACCOUNT:{china_account}")
+def photo_download(directory, transfer_album, recent, auto_delete, modify_olds, workers):
+    global iService
     logging.info(f"PHOTO DOWNLOAD DIRECTORY:[{directory}]")
+    logging.info(f"TRANSFER ALBUM:[{transfer_album}]")
     logging.info(f"RECENT:{recent}")
     logging.info(f"AUTO_DELETE: {auto_delete}")
     logging.info(f"MODIFY_OLDS: {modify_olds}")
-    iService.download_photo(directory, recent=recent, modify_olds=modify_olds, auto_delete=auto_delete,
+    iService.download_photo(directory, recent=recent, transfer_album=transfer_album, modify_olds=modify_olds, auto_delete=auto_delete,
                             max_thread_count=workers)
 
 
