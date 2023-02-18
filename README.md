@@ -34,7 +34,10 @@ icloud -d /external/SADAM/icloud/photos/ --recent 500
 ```shell
 icloud -u <username> -p <password> -d /external/SADAM/icloud/photos/ --recent 500
 ```
-
+### 通过crontab 每隔半个小时自动启动
+```shell
+*/30 * * * * /<python绝对路径>/python3.9 /<项目绝对路径>/icloud.py -u <icloud账号> -p <密码> --china-account photo-download -d /external/SADAM/icloud/photos/ --transfer-album Transfer --auto-delete >> /opt/icloud-killer/logs/last-$(date "+%Y%m%d%H%M").log 2>&1
+```
 
 ## <img width="50" src="assets/dccb81ba3f0f63e9a50c162007f59c4a.png"> Driver (Files)
 

@@ -13,8 +13,6 @@ import click
 
 from lib import icloud, logger
 
-iService = None
-
 
 @click.group()
 @click.option(
