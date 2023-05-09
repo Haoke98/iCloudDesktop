@@ -11,11 +11,14 @@ import os
 import platform
 import sqlite3
 import sys
+import traceback
 from concurrent.futures import ThreadPoolExecutor
 from subprocess import call
 
 from pyicloud import PyiCloudService as __iCloudService__
 from pyicloud.services.photos import PhotoAsset
+
+from lib import jpeg
 
 
 class IcloudService(__iCloudService__):
@@ -93,11 +96,6 @@ class IcloudService(__iCloudService__):
             __modify_create_date__()
 
         logging.info(f"开始了{photo.id}, {photo.filename}, {photo.size}")
-        con = sqlite3.connect(os.path.join(outputDir, 'info.db'))
-        con.execute(
-            'INSERT OR IGNORE INTO photos(id, created, asset_date, added_date, filename,size,dimension_x,dimension_y) values (?,?,?,?,?,?,?,?)',
-            (photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size,
-             photo.dimensions[0], photo.dimensions[1]))
         _ext_ = str(photo.filename).split(".")[1]
         _file_name_ = f"{photo.id.replace('/', '-')}.{_ext_}"
         raw_path = os.path.join(outputDir, _file_name_)
@@ -116,8 +114,22 @@ class IcloudService(__iCloudService__):
                     __modify_create_date__()
         else:
             __download__()
+
+        hasLocationInfo, lat, lng = False, None, None
+        if raw_path.lower().endswith(".jpg"):
+            try:
+                hasLocationInfo, lat, lng = jpeg.get_gps_info(raw_path=raw_path)
+            except Exception as e:
+                logging.error(traceback.format_exc())
+
+        con = sqlite3.connect(os.path.join(outputDir, 'info.db'))
+        con.execute(
+            'INSERT OR IGNORE INTO photos(id, created, asset_date, added_date, filename,size,dimension_x,dimension_y,lat,lng) values (?,?,?,?,?,?,?,?,?,?)',
+            (photo.id, photo.created, photo.asset_date, photo.added_date, photo.filename, photo.size,
+             photo.dimensions[0], photo.dimensions[1], lat, lng))
         con.commit()
         con.close()
+
         self.COMPLETED_OF_DOWNLOAD_PHOTO += 1
         logging.info(
             f"%0.2f%% ({self.COMPLETED_OF_DOWNLOAD_PHOTO}/{recent}):{photo.id}, {photo.filename}, {raw_path}" % (
@@ -129,13 +141,13 @@ class IcloudService(__iCloudService__):
                        auto_delete: bool = False,
                        modify_olds: bool = False, max_thread_count: int = 3):
         def handle(album, recent):
-            _all = iter(album)
+            _all = album.photos
             logging.info(f"相册[{album.name}]里总共有{len(album)}个媒体对象（包括视频，短视频，Live实况图，动图，JPG，JPEG，PNG...etc.)")
             if recent is None:
                 recent = len(album)
             if max_thread_count == 1:
                 for i in range(1, recent + 1):
-                    photo = next(_all, None)
+                    photo = next(_all)
                     self.handle(outputDir, recent, photo, modify_olds, auto_delete)
             else:
                 pool = ThreadPoolExecutor(max_workers=max_thread_count)
