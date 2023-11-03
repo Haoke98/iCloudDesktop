@@ -82,6 +82,15 @@ api.iphone.location()
   'locationMode': None
 }
 ```
+## Star History
+
+<a href="https://star-history.com/#haoke98/icloud-killer&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=haoke98/icloud-killer&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=haoke98/icloud-killer&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=haoke98/icloud-killer&type=Date" />
+  </picture>
+</a>
 
 ## links
 
