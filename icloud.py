@@ -19,7 +19,7 @@ from lib import icloud, logger
     "-u", "--username",
     help="Your iCloud username or email address",
     metavar="<username>",
-    prompt="iCloud username/email",
+    prompt="iCloud username(mobile/email)",
     required=True
 )
 @click.option(
@@ -27,12 +27,14 @@ from lib import icloud, logger
     help="Your iCloud password "
          "(default: use PyiCloud keyring or prompt for password)",
     metavar="<password>",
+    prompt="iCloud password",
     required=True
 )
 @click.option(
     "--china-account",
     help='Specify the "HOME_ENDPOINT" and "SETUP_ENDPOINT" for the "China Mainland Accounts". ',
     is_flag=True,
+    prompt="isChinaAccount?"
 )
 @click.version_option()
 def main(username, password, china_account):
@@ -82,8 +84,24 @@ def photo_download(directory, transfer_album, recent, auto_delete, modify_olds, 
     logging.info(f"RECENT:{recent}")
     logging.info(f"AUTO_DELETE: {auto_delete}")
     logging.info(f"MODIFY_OLDS: {modify_olds}")
-    iService.download_photo(directory, recent=recent, transfer_album=transfer_album, modify_olds=modify_olds, auto_delete=auto_delete,
+    iService.download_photo(directory, recent=recent, transfer_album=transfer_album, modify_olds=modify_olds,
+                            auto_delete=auto_delete,
                             max_thread_count=workers)
+
+
+@main.command(options_metavar="<options>")
+def test():
+    global iService
+    for i, album_name in enumerate(iService.photos.albums):
+        album = iService.photos.albums[album_name]
+        print(i, album_name, len(album))
+    all_photos = iService.photos.all
+    print(len(all_photos))
+    for i, p in enumerate(all_photos):
+        print(i, p.id, p.filename, p.size, p.dimensions, p.created, p.asset_date, p.added_date, p.versions)
+        if p.created != p.asset_date:
+            raise Exception("异常数据")
+        pass
 
 
 if __name__ == "__main__":
