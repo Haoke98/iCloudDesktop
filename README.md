@@ -1,38 +1,74 @@
-# <cite>iCloud Universal Tools</cite> 
+# <cite>iCloud Console</cite> 
 <p align="center">
     <img width="300" src="assets/41166dada6559cb93c7a4ff0ea681e52.png">
 </p>
 
 ## Usage
 ```shell
-Usage: icloud.py <options>
+Usage: icloud.py [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  -u, --username <username>    Your iCloud username or email address
-  -p, --password <password>    Your iCloud password (default: use PyiCloud
-                               keyring or prompt for password)
-  --china-account              Specify the "HOME_ENDPOINT" and
-                               "SETUP_ENDPOINT" for the "China Mainland
-                               Accounts".
-  -d, --directory <directory>  Local directory that should be used for
-                               download
-  --recent INTEGER RANGE       Number of recent photos to download (default:
-                               download all photos)  [x>=0]
-  --auto-delete                Scans the "Recently Deleted" folder and deletes
-                               any files found in there. (If you restore the
-                               photo in iCloud, it will be downloaded again.)
-  --modify-olds                Modify the "Created Time" of the old files that
-                               already been in the folder.
-  --version                    Show the version and exit.
-  -h, --help                   Show this message and exit.
+  -u, --username <username>  Your iCloud username or email address  [required]
+  -p, --password <password>  Your iCloud password (default: use PyiCloud
+                             keyring or prompt for password)  [required]
+
+  --china-account            Specify the "HOME_ENDPOINT" and "SETUP_ENDPOINT"
+                             for the "China Mainland Accounts".
+
+  --version                  Show the version and exit.
+  --help                     Show this message and exit.
+
+Commands:
+  photo-download
+  test
+
 ```
 ## <img width="50" src="assets/1c11f0fa22d4e93f8dc179b8ff84791d.png"> Photos Download
 ```shell
+Usage: icloud.py photo-download <options>
+
+Options:
+  -d, --directory <directory>    Local directory that should be used for
+                                 download
+
+  --recent INTEGER RANGE         Number of recent photos to download (default:
+                                 download all photos)
+
+  --auto-delete                  Scans the "Recently Deleted" folder and
+                                 deletes any files found in there. (If you
+                                 restore the photo in iCloud, it will be
+                                 downloaded again.)
+
+  --modify-olds                  Modify the "Created Time" of the old files
+                                 that already been in the folder.
+
+  --workers INTEGER RANGE        Number of the thread to download
+                                 photo.(Default is 3)
+
+  --transfer-album <album_name>  Determine the album that will be downloaded.
+  --help                         Show this message and exit.
+```
+示例1
+```shell
 icloud -d /external/SADAM/icloud/photos/ --recent 500
 ```
-
+示例2
 ```shell
 icloud -u <username> -p <password> -d /external/SADAM/icloud/photos/ --recent 500
+```
+示例3
+```shell
+icloud -u <username> -p <password>
+--china-account
+photo-download
+-d
+/Volumes/share/SADAM/icloud/photos
+--transfer-album
+Hidden
+--modify-olds
+--auto-delete
+--workers
+1
 ```
 ### 通过crontab 每隔半个小时自动启动
 ```shell
@@ -49,7 +85,7 @@ icloud -u <username> -p <password> -d /external/SADAM/icloud/photos/ --recent 50
 
 
 
-## <img width="50" src="https://www.icloud.com.cn/system/icloud.com/2302Hotfix226/en-us/32f2db22e40a7765c151f4d947c2be50.png"> Location
+## <img width="50" src="docs/statics/location.png"> Location
 
 
 
