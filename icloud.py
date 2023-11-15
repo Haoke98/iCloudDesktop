@@ -10,6 +10,7 @@
 import logging
 
 import click
+from prettytable import PrettyTable
 
 from lib import icloud, logger
 
@@ -43,7 +44,8 @@ def main(username, password, china_account):
     iService = icloud.IcloudService(username, password, china_account)
 
 
-@main.command(options_metavar="<options>")
+@main.command(options_metavar="<options>",
+              help="Manage Photos on your icloud. (Transform Album, Download recent photos.)")
 @click.option(
     "-d", "--directory",
     help="Local directory that should be used for download",
@@ -89,7 +91,36 @@ def photo_download(directory, transfer_album, recent, auto_delete, modify_olds, 
                             max_thread_count=workers)
 
 
-@main.command(options_metavar="<options>")
+@main.command(options_metavar="<options>",
+              help="Device and Location, Find device Location, Get device Status, Show message on device, Remote lock device.")
+def device():
+    table = PrettyTable()
+    table.field_names = ["序号", "设备名称", "型号", "探索ID", "状态", "能否获取位置信息？", "是否可以在锁定后擦除？", "是否已开启家人分享?", "能否标记为丢失？", "电池水平",
+                         "丢失时间", "ID"]
+    devices = iService.devices
+    for i, device in enumerate(devices):
+        data = device.data
+        table.add_row(
+            [i, data.get("name"), data.get("deviceModel"), data.get("deviceDiscoveryId"), data.get("deviceStatus"),
+             data.get("locationEnabled"), data.get("canWipeAfterLock"), data.get("fmlyShare"),
+             data.get("lostModeCapable"), data.get("batteryLevel"), data.get("lostTimeStamp"), data.get("id")])
+        pass
+    print(table)
+    while True:
+        i = click.prompt('Which device would you like to use?', type=int, default=0)
+        row = table._rows[i]
+        device_id = row[-1]
+        device = devices[device_id]
+        print("CurrentStatus：", device.status())
+        print("CurrentLocation：", device.location())
+        isOk = click.prompt("Do you want to show some message on your device?", type=bool, default=False)
+        if isOk:
+            msg = click.prompt("Please input some message here.", default="Don't do anything on my device.")
+            device.display_message(message=msg)
+            print("Its Done@!")
+
+
+@main.command(options_metavar="<options>", help="Do some experimental tes.")
 def test():
     global iService
     for i, album_name in enumerate(iService.photos.albums):
@@ -105,5 +136,5 @@ def test():
 
 
 if __name__ == "__main__":
-    logger.init("icloud")
+    logger.init("icloud", console_level=logging.INFO)
     main()

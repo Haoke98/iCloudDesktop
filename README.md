@@ -19,9 +19,9 @@ Options:
   --help                     Show this message and exit.
 
 Commands:
-  photo-download
-  test
-
+  device          Device and Location, Find device Location, Get device...
+  photo-download  Manage Photos on your icloud.
+  test            Do some experimental tes.
 ```
 ## <img width="50" src="assets/1c11f0fa22d4e93f8dc179b8ff84791d.png"> Photos Download （2FA）
 ```shell
@@ -85,7 +85,7 @@ Hidden
 
 
 
-## <img width="50" src="docs/statics/location.png"> Device And Location (No 2FA)
+## <img width="50" src="docs/statics/location.png"> Device And Location (2FA)
 
 
 ```python
