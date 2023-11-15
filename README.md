@@ -23,7 +23,7 @@ Commands:
   test
 
 ```
-## <img width="50" src="assets/1c11f0fa22d4e93f8dc179b8ff84791d.png"> Photos Download
+## <img width="50" src="assets/1c11f0fa22d4e93f8dc179b8ff84791d.png"> Photos Download （2FA）
 ```shell
 Usage: icloud.py photo-download <options>
 
@@ -75,21 +75,18 @@ Hidden
 */30 * * * * /<python绝对路径>/python3.9 /<项目绝对路径>/icloud.py -u <icloud账号> -p <密码> --china-account photo-download -d /external/SADAM/icloud/photos/ --transfer-album Transfer --auto-delete >> /opt/icloud-killer/logs/last-$(date "+%Y%m%d%H%M").log 2>&1
 ```
 
-## <img width="50" src="assets/dccb81ba3f0f63e9a50c162007f59c4a.png"> Driver (Files)
+## <img width="50" src="assets/dccb81ba3f0f63e9a50c162007f59c4a.png"> Driver And Files (2FA)
 
 
 
-## <img width="50" src="assets/ddc3380f93d44a376c586796bb7c16a7.png"> Reminds
+## <img width="50" src="assets/ddc3380f93d44a376c586796bb7c16a7.png"> Reminds (2FA)
 
-## <img width="50" src="assets/4b1d90456b68a8d4d4b91adb39e60b70.png"> Contact
-
-
-
-## <img width="50" src="docs/statics/location.png"> Location
+## <img width="50" src="assets/4b1d90456b68a8d4d4b91adb39e60b70.png"> Contact (2FA)
 
 
 
-[//]: # (![]&#40;https://www.icloud.com.cn/system/icloud.com/2302Hotfix226/en-us/32f2db22e40a7765c151f4d947c2be50.png&#41;)
+## <img width="50" src="docs/statics/location.png"> Device And Location (No 2FA)
+
 
 ```python
 api.iphone.location()
