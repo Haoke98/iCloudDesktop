@@ -85,8 +85,18 @@ Hidden
 
 
 
-## <img width="50" src="docs/statics/location.png"> Device And Location (2FA)
-
+## <img width="50" src="docs/statics/location.png"> Device And Location (Weak 2FA: Just send)
+* Get device info.
+  * location
+  * Status
+  * Battery level
+  * Device model
+  * Device name
+  * Device ID
+* Remote Control
+  * locking device
+  * Show message
+  * Play sound
 
 ```python
 api.iphone.location()
