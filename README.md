@@ -125,6 +125,11 @@ api.iphone.location()
   'locationMode': None
 }
 ```
+## 开发计划
+* [ ] 实现按照不同的排序展示Assets.
+* [ ] 实现便于小白用户操作的可视化GUI界面(不用搭建环境, 下载对应平台的Release即可能用, 命令行功能依然保留).
+* [ ] 实现可一键迁移Assets到Immich的功能.
+
 ## Star History
 
 <a href="https://star-history.com/#haoke98/icloud-killer&Date">
