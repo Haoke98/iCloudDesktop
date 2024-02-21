@@ -6,6 +6,8 @@
 
 English | [简体中文](README.zh.md) 
 
+<img src="assets/login_page.png" alt="Login Page">
+
 ## Usage
 
 ```shell

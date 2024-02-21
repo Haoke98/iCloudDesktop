@@ -5,6 +5,9 @@
 
 [English](README.md) | 简体中文 
 
+<img src="assets/login_page.png" alt="登录页">
+
+
 ## Usage
 ```shell
 Usage: icloud.py [OPTIONS] COMMAND [ARGS]...

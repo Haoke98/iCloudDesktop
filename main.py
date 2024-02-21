@@ -27,7 +27,7 @@ class PyICloudClient(tk.Tk):
         self.title("PyICloudClient")
 
         init_database()
-        width = 280
+        width = 300
         height = 400
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
