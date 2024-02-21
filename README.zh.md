@@ -1,13 +1,11 @@
-# <cite>iCloud Console</cite>
-
+# <cite>iCloud Console</cite> 
 <p align="center">
     <img width="300" src="assets/41166dada6559cb93c7a4ff0ea681e52.png">
 </p>
 
-English | [简体中文](README.zh.md) 
+[English](README.md) | 简体中文 
 
 ## Usage
-
 ```shell
 Usage: icloud.py [OPTIONS] COMMAND [ARGS]...
 
@@ -27,9 +25,7 @@ Commands:
   photo-download  Manage Photos on your icloud.
   test            Do some experimental tes.
 ```
-
 ## <img width="50" src="assets/1c11f0fa22d4e93f8dc179b8ff84791d.png"> Photos Download （2FA）
-
 ```shell
 Usage: icloud.py photo-download <options>
 
@@ -54,21 +50,15 @@ Options:
   --transfer-album <album_name>  Determine the album that will be downloaded.
   --help                         Show this message and exit.
 ```
-
-Example 1
-
+示例1
 ```shell
 icloud -d /external/SADAM/icloud/photos/ --recent 500
 ```
-
-Example 2
-
+示例2
 ```shell
 icloud -u <username> -p <password> -d /external/SADAM/icloud/photos/ --recent 500
 ```
-
-Example 3
-
+示例3
 ```shell
 icloud -u <username> -p <password>
 --china-account
@@ -82,32 +72,33 @@ Hidden
 --workers
 1
 ```
-
-### Automatically start every half hour through crontab
-
+### 通过crontab 每隔半个小时自动启动
 ```shell
-*/30 * * * * /<python absolute path>/python3.9 /<project absolute path>/icloud.py -u <icloud account> -p <password> --china-account photo-download -d /external /SADAM/icloud/photos/ --transfer-album Transfer --auto-delete >> /opt/icloud-killer/logs/last-$(date "+%Y%m%d%H%M").log 2>&1
+*/30 * * * * /<python绝对路径>/python3.9 /<项目绝对路径>/icloud.py -u <icloud账号> -p <密码> --china-account photo-download -d /external/SADAM/icloud/photos/ --transfer-album Transfer --auto-delete >> /opt/icloud-killer/logs/last-$(date "+%Y%m%d%H%M").log 2>&1
 ```
 
 ## <img width="50" src="assets/dccb81ba3f0f63e9a50c162007f59c4a.png"> Driver And Files (2FA)
+
+
 
 ## <img width="50" src="assets/ddc3380f93d44a376c586796bb7c16a7.png"> Reminds (2FA)
 
 ## <img width="50" src="assets/4b1d90456b68a8d4d4b91adb39e60b70.png"> Contact (2FA)
 
-## <img width="50" src="docs/statics/location.png"> Device And Location (Weak 2FA: Just send)
 
+
+## <img width="50" src="docs/statics/location.png"> Device And Location (Weak 2FA: Just send)
 * Get device info.
-    * location
-    * Status
-    * Battery level
-    * Device model
-    * Device name
-    * Device ID
+  * location
+  * Status
+  * Battery level
+  * Device model
+  * Device name
+  * Device ID
 * Remote Control
-    * locking device
-    * Show message
-    * Play sound
+  * locking device
+  * Show message
+  * Play sound
 
 ```python
 api.iphone.location()
@@ -121,8 +112,7 @@ api.iphone.location()
   'secureLocation': None,
   'secureLocationTs': 0,
   'altitude': 0.0,
-  'latitude': 43.894873066105184,
-  //纬度
+  'latitude': 43.894873066105184,//纬度
   'longitude': 87.58595865485619,
   //经度
   'horizontalAccuracy': 65.0,
@@ -137,13 +127,10 @@ api.iphone.location()
   'locationMode': None
 }
 ```
-
-## Development Plan
-
-* [ ] implements displaying Assets in different orders.
-* [ ] Implement a visual GUI interface that is easy for novice users to operate (no need to set up an environment, just
-  download the Release of the corresponding platform to use it, and the command line function is still retained).
-* [ ] Implement the function of migrating Assets to Immich with one click.
+## 开发计划
+* [ ] 实现按照不同的排序展示Assets.
+* [ ] 实现便于小白用户操作的可视化GUI界面(不用搭建环境, 下载对应平台的Release即可能用, 命令行功能依然保留).
+* [ ] 实现可一键迁移Assets到Immich的功能.
 
 ## Star History
 
@@ -155,26 +142,25 @@ api.iphone.location()
   </picture>
 </a>
 
-## Problems:
-
+## 存在的问题:
 * Missing apple_id field
-    * Detailed error message:
-      ```shell
-      Traceback (most recent call last):
-        File "test.py", line 10, in <module>
-          api = PyiCloudService("***", "***")
-        File "/usr/local/lib/python3.9/site-packages/pyicloud/base.py", line 268, in __init__
-          self.authenticate()
-        File "/usr/local/lib/python3.9/site-packages/pyicloud/base.py", line 328, in authenticate
-          self._authenticate_with_token()
-        File "/usr/local/lib/python3.9/site-packages/pyicloud/base.py", line 350, in _authenticate_with_token
-          raise PyiCloudFailedLoginException(msg, error)
-      pyicloud.exceptions.PyiCloudFailedLoginException: ('Invalid authentication token.', PyiCloudAPIResponseException('Missing apple_id field'))
-      ```
-    * solution:
-        * [Apparently `apple_id` and `password` are now required on method:`_authenticate_with_token`](https://github.com/picklepete/pyicloud/issues/349#issuecomment-943885985)
+  * 详细报错信息:
+    ```shell
+    Traceback (most recent call last):
+      File "test.py", line 10, in <module>
+        api = PyiCloudService("***", "***")
+      File "/usr/local/lib/python3.9/site-packages/pyicloud/base.py", line 268, in __init__
+        self.authenticate()
+      File "/usr/local/lib/python3.9/site-packages/pyicloud/base.py", line 328, in authenticate
+        self._authenticate_with_token()
+      File "/usr/local/lib/python3.9/site-packages/pyicloud/base.py", line 350, in _authenticate_with_token
+        raise PyiCloudFailedLoginException(msg, error)
+    pyicloud.exceptions.PyiCloudFailedLoginException: ('Invalid authentication token.', PyiCloudAPIResponseException('Missing apple_id field'))
+    ```
+  * 解决方案: 
+    * [Apparently `apple_id` and `password` are now required on method:`_authenticate_with_token`](https://github.com/picklepete/pyicloud/issues/349#issuecomment-943885985)
 
-## Related Links
+## 相关链接
 
 1. [PyiCloud PyPI Home Page](https://pypi.org/project/pyicloud/)
-2. [PyiCloud GitHub Home Page](https://pypi.org/project/pyicloud/)
+2. [PyiCloud GitHub Home Page](https://pypi.org/project/pyicloud/) 
