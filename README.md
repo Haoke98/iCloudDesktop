@@ -7,8 +7,8 @@
 English | [简体中文](README.zh.md)
 
 <div style="display: flex;">
-<img src="assets/login_page.png" alt="Login Page" style="flex:1; margin-right: 10px;" >
-<img src="assets/sync.gif" alt="Login Page" style="flex:4; margin-right: 10px;" >
+<img src="assets/login_page.png" alt="Login Page" style="width:260px; margin-right: 10px;" >
+<img src="assets/sync.gif" alt="Login Page" style="width:740px; margin-right: 10px;" >
 </div>
 
 
