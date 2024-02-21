@@ -10,7 +10,8 @@ import json
 import logging
 import time
 import tkinter as tk
-from core import init_database, PyiCloudService
+
+from core import PyiCloudService
 
 
 class LoginPage(tk.Frame):

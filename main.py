@@ -7,16 +7,11 @@
 @disc:
 ======================================="""
 import logging
-import time
 import tkinter as tk
-from tkinter import ttk
-import sqlite3
 
-from core import init_database, PyiCloudService
-from lib import logger, icloud
+from core import init_database
+from lib import logger
 from pages import HomePage, LoginPage
-from lib.icloud import IcloudService as __iCloudService__
-from tkinter import simpledialog
 
 iService = None
 
