@@ -4,9 +4,13 @@
     <img width="300" src="assets/41166dada6559cb93c7a4ff0ea681e52.png">
 </p>
 
-English | [简体中文](README.zh.md) 
+English | [简体中文](README.zh.md)
 
-<img src="assets/login_page.png" alt="Login Page">
+<div style="display: flex;">
+<img src="assets/login_page.png" alt="Login Page" style="flex:1; margin-right: 10px;" >
+<img src="assets/sync.gif" alt="Login Page" style="flex:4; margin-right: 10px;" >
+</div>
+
 
 ## Usage
 

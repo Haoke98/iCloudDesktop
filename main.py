@@ -27,22 +27,23 @@ class PyICloudClient(tk.Tk):
         self.title("PyICloudClient")
 
         init_database()
-        width = 300
-        height = 400
+        self.reset_size(300, 400)
+        self.title("PyICloudClient | 登陆页")
+        self.page_login.pack(expand=True, fill=tk.BOTH)
+
+    def reset_size(self, width: int, height: int):
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
         self.geometry(f"{width}x{height}+{x}+{y}")
-        self.title("PyICloudClient | 登陆页")
-        self.page_login.pack(expand=True, fill=tk.BOTH)
 
     def show_homepage(self, username):
         self.page_login.pack_forget()  # 隐藏登录页面
         self.page_home.show(username)
         # 创建主页窗口
-        self.geometry("800x400")
+        self.reset_size(1200, 600)
         self.title("PyICloudClient | 登陆页")
 
     def logout(self):
