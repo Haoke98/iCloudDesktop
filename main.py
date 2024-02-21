@@ -32,7 +32,14 @@ class PyICloudClient(tk.Tk):
         self.title("PyICloudClient")
 
         init_database()
-        self.geometry("200x400")
+        width = 280
+        height = 400
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.geometry(f"{width}x{height}+{x}+{y}")
         self.title("PyICloudClient | 登陆页")
         self.page_login.pack(expand=True, fill=tk.BOTH)
 

@@ -3,3 +3,4 @@
 *.csv
 /.idea/
 *.log
+accounts.json
