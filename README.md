@@ -147,12 +147,15 @@ api.iphone.location()
 ```
 
 ## Development Plan
-
 * [ ] implements displaying Assets in different orders.
-* [ ] Implement a visual GUI interface that is easy for novice users to operate (no need to set up an environment, just
-  download the Release of the corresponding platform to use it, and the command line function is still retained).
+* [ ] Implement a visual GUI interface that is easy for novice users to operate (no need to set up an environment, just download the Release of the corresponding platform to use it, and the command line function is still retained).
 * [ ] Implement the function of migrating Assets to Immich with one click.
-
+* [ ] Data migration function
+   * [ ] One-click migration and synchronization removed from iCloud (free up iCloud space)
+   * [ ] Support migration to local hard disk (directory)
+   * [ ] Support migration to third-party platforms:
+     * [ ] [immich-app/immich](https://github.com/immich-app/immich)
+     * [ ] [NextCloud](https://github.com/nextcloud)
 ## Star History
 
 <a href="https://star-history.com/#haoke98/icloud-killer&Date">
