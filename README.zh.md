@@ -5,10 +5,11 @@
 
 [English](README.md) | 简体中文 
 
-<div style="display: flex;">
-<img src="assets/login_page.png" alt="Login Page" style="flex:1; margin-right: 10px;" >
-<img src="assets/sync.gif" alt="Login Page" style="flex:4; margin-right: 10px;" >
-</div>
+
+| <img src="assets/sync.gif" alt="Image 1"  height="400"/> | <img src="assets/login_page.png" alt="Image 1"  height="400"/> |
+|:--------------------------------------------------------:|:--------------------------------------------------------------:|
+|                        *主页和交互预览*                         |                            *登录页预览*                             |
+
 
 
 ## Usage

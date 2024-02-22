@@ -10,8 +10,8 @@ English | [简体中文](README.zh.md)
 
 
 | <img src="assets/sync.gif" alt="Image 1"  height="400"/> | <img src="assets/login_page.png" alt="Image 1"  height="400"/> |
-|:-----------------------:|:-----------------------:|
-| *Caption for HomePage*   | *Caption for LoginPage*   |
+|:--------------------------------------------------------:|:--------------------------------------------------------------:|
+|         *Preview of home page and interactions*          |                    *Preview of login page*                     |
 
 
 ## Usage
