@@ -6,6 +6,7 @@
 @Software: PyCharm
 @disc:
 ======================================="""
+import json
 import tkinter as tk
 from tkinter import ttk
 
@@ -16,8 +17,13 @@ class HomePage(tk.Frame):
         self.master = master
 
         # 在主页上显示用户信息和头像
-        self.welcome_label = tk.Label(self, text="")
-        self.welcome_label.pack()
+        user_block = tk.Frame(self)
+        user_block.pack()
+
+        self.welcome_label = tk.Label(user_block, text="")
+        self.welcome_label.pack(side=tk.LEFT)
+
+        tk.Button(user_block, text="注销", command=self.master.logout).pack(side=tk.LEFT)
 
         # 创建头像图标
         # 这里使用一个简单的示例图片代替真实的用户头像
@@ -27,8 +33,7 @@ class HomePage(tk.Frame):
         avatar_label.pack()
 
         # 创建登录按钮
-        self.login_button = tk.Button(self, text="开始同步", command=self.sync)
-        self.login_button.pack()
+        tk.Button(self, text="开始同步", command=self.sync).pack()
 
         # 创建一个进度条
         self.progress_bar = ttk.Progressbar(self, orient="horizontal", length=300, mode="determinate")
@@ -67,11 +72,31 @@ class HomePage(tk.Frame):
         self.progress_bar["maximum"] = total
         for i, p in enumerate(all_photos):
             progress = (i + 1) / total * 100
-            print(f"{progress:.2f}%({i + 1}/{total})", p, type(p), vars(p))
+            document = vars(p)
+            # 移除'_service'字段
+            document.pop('_service', None)
+            # 目前只有大小字段参与排序, 所以只需把它单独拿出来存储到特定的字段中
+            # TODO: 如果后期有需要可以挨个从master_record和asset_record中解析出来
+            values = [
+                document["_master_record"]["recordName"],
+                document["_master_record"]["fields"]["resOriginalRes"]["value"]["size"],
+                document["_master_record"]["fields"]["resOriginalFileType"]["value"],
+                document["_master_record"]["created"]["timestamp"],
+                document["_master_record"]["modified"]["timestamp"],
+                json.dumps(document["_master_record"], ensure_ascii=False),
+                json.dumps(document["_asset_record"], ensure_ascii=False),
+            ]
+            print(f"{progress:.2f}%({i + 1}/{total})", values)
             # , p.id, p.filename, p.size, p.dimensions,
             #                   p.created,
             #                   p.asset_date,
             #                   p.added_date, p.versions
+            # 插入文档
+            self.master.db_cursor.execute(
+                "INSERT OR REPLACE INTO assets (recordName, size, file_type,created,modified,master_fields, asset_fields) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                values)
+            self.master.db_conn.commit()
+
             self.progress_message.config(text=f"正在进行资源同步{progress:.2f}% ( {i + 1} / {total} )")
             self.progress_bar["value"] = i + 1
             self.update_idletasks()  # 更新Tkinter窗口

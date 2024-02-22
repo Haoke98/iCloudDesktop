@@ -122,13 +122,24 @@ def init_database():
     # 创建用户表
     c.execute('''CREATE TABLE IF NOT EXISTS users
                      (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT unique , password TEXT)''')
+
+    # 删除旧表格（如果存在）
+    c.execute('''DROP TABLE IF EXISTS assets''')
     # 创建媒体资源表
-    c.execute('''CREATE TABLE IF NOT EXISTS assets
+    c.execute('''CREATE TABLE assets
                                       (
                                         recordName TEXT PRIMARY KEY, 
                                         master_fields TEXT,
                                         asset_fields TEXT,
-                                        size TEXT
+                                        size INTEGER,
+                                        file_type TEXT,
+                                        created INTEGER,
+                                        modified INTEGER
                                         )
                                       ''')
+    # 添加索引
+    c.execute('''CREATE INDEX IF NOT EXISTS size_index ON assets (size)''')
+    c.execute('''CREATE INDEX IF NOT EXISTS file_type_index ON assets (file_type)''')
+    c.execute('''CREATE INDEX IF NOT EXISTS created_time_index ON assets (created)''')
+    c.execute('''CREATE INDEX IF NOT EXISTS modified_time_index ON assets (modified)''')
     return conn, c
