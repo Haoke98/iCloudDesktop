@@ -6,17 +6,18 @@
 @Software: PyCharm
 @disc:
 ======================================="""
-import json
 import logging
 import time
 import tkinter as tk
 from tkinter import font as tkFont
+
 from core import PyiCloudService
 
 
 class LoginPage(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
+        self.users = None
         self.message_label = None
         self.login_button = None
         self.load_account_btn = None
@@ -24,6 +25,8 @@ class LoginPage(tk.Frame):
         self.password_label = None
         self.username_entry = None
         self.username_label = None
+        self.remember_password = tk.BooleanVar()
+        self.remember_password.set(False)
         self.master = master
         self.create_widgets()
 
@@ -57,8 +60,16 @@ class LoginPage(tk.Frame):
         # 创建加载账号按钮和登录按钮
         button_frame = tk.Frame(self)
         button_frame.pack()
-        self.load_account_btn = tk.Button(button_frame, text="加载账号", command=self.load_account)
-        self.load_account_btn.pack(side=tk.LEFT)
+
+        self.load_account_btn = tk.Button(button_frame, text="加载已存账号", command=self.load_account)
+
+        self.master.db_cursor.execute("SELECT username,password FROM users;")
+        self.users = self.master.db_cursor.fetchall()
+        if len(self.users) > 0:
+            self.load_account_btn.pack(side=tk.LEFT)
+
+        tk.Checkbutton(button_frame, text="记住密码", variable=self.remember_password).pack(side=tk.LEFT)
+
         self.login_button = tk.Button(button_frame, text="登录", command=self.login)
         self.login_button.pack(side=tk.LEFT)
 
@@ -72,18 +83,25 @@ class LoginPage(tk.Frame):
         logging.info(f"[login] username: {username}, password: [{password}]")
         logging.info(f"CHINA_ACCOUNT:{china_account}")
         self.master.iService = PyiCloudService(self.master, username, password, china_account)
+        startedAt = time.time()
         while True:
             if self.master.iService.account.devices:
                 print("登陆成功!")
+                if self.remember_password.get():
+                    self.master.db_cursor.execute("INSERT OR REPLACE INTO users (username, password) VALUES (?, ?)",
+                                                  (username, password))
+                    self.master.db_conn.commit()
                 self.master.show_homepage(username)
                 break
             else:
                 print("还未登陆...")
-                time.sleep(2)
+                self.message_label.insert(0, f"正在登陆.....{time.time() - startedAt}s")
+                time.sleep(1)
 
     def load_account(self):
-        with open("accounts.json", "r") as f:
-            accounts = json.load(f)
-            for account in accounts:
-                self.username_entry.insert(0, account["username"])
-                self.password_entry.insert(0, account["password"])
+        for user in self.users:
+            print(user)
+            self.username_entry.delete(0, tk.END)  # 删除旧文本
+            self.username_entry.insert(0, user[0])
+            self.password_entry.delete(0, tk.END)
+            self.password_entry.insert(0, user[1])

@@ -117,8 +117,18 @@ def login(ctx, username, password):
 
 def init_database():
     # 连接到数据库（如果不存在则会创建）
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect("data.db")
     c = conn.cursor()
     # 创建用户表
     c.execute('''CREATE TABLE IF NOT EXISTS users
-                     (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)''')
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT unique , password TEXT)''')
+    # 创建媒体资源表
+    c.execute('''CREATE TABLE IF NOT EXISTS assets
+                                      (
+                                        recordName TEXT PRIMARY KEY, 
+                                        master_fields TEXT,
+                                        asset_fields TEXT,
+                                        size TEXT
+                                        )
+                                      ''')
+    return conn, c
