@@ -6,9 +6,11 @@
 
 English | [简体中文](README.zh.md)
 
+<img src="assets/sync.gif" alt="Login Page">
+
 <div style="display: flex;">
-<img src="assets/login_page.png" alt="Login Page" style="width:260px; margin-right: 10px;" >
-<img src="assets/sync.gif" alt="Login Page" style="width:740px; margin-right: 10px;" >
+<img src="assets/login_page.png" alt="Login Page" align="right" width="320" >
+
 </div>
 
 
