@@ -7,6 +7,8 @@
 @disc:
 ======================================="""
 import logging
+import sqlite3
+import threading
 import time
 import tkinter as tk
 from tkinter import font as tkFont
@@ -17,6 +19,8 @@ from core import PyiCloudService
 class LoginPage(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
+        self.update_view_th = None
+        self.title_label = None
         self.users = None
         self.message_label = None
         self.login_button = None
@@ -29,6 +33,10 @@ class LoginPage(tk.Frame):
         self.remember_password.set(False)
         self.master = master
         self.create_widgets()
+        self.login_processing = False  # 登陆正在进行
+        self.login_start_at = None  # 登陆开始
+
+        self._stop_event = threading.Event()
 
     def create_widgets(self):
         # 创建Logo
@@ -39,8 +47,8 @@ class LoginPage(tk.Frame):
 
         # 设置字体
         custom_font = tkFont.Font(family="Arial", size=24, weight="bold")
-        title_label = tk.Label(self, text="iCloud", font=custom_font, foreground="white")
-        title_label.pack(side=tk.TOP)
+        self.title_label = tk.Label(self, text="iCloud", font=custom_font, foreground="white")
+        self.title_label.pack(side=tk.TOP)
 
         # 创建用户名和密码输入框
         username_frame = tk.Frame(self)
@@ -77,26 +85,61 @@ class LoginPage(tk.Frame):
         self.message_label = tk.Label(self, text="")
         self.message_label.pack()
 
-    def login(self, china_account: bool = True):
+    def async_update_view(self):
+        while not self._stop_event.is_set():
+            if self.login_processing:
+                dlt = time.time() - self.login_start_at
+                self.message_label.config(text=f"正在登陆...{dlt:0.0f}s")
+                # 设置登陆超时
+                max_dlt = 60 * 60 * 60
+                compare_result = dlt > max_dlt
+                print(f"正在登陆.....{dlt}s, 超时:{compare_result}")
+        self.message_label.config(text="")
+
+    def show(self):
+        self.update_view_th = threading.Thread(target=self.async_update_view)
+        self.update_view_th.start()
+        self.pack(expand=True, fill=tk.BOTH)
+
+    def pack_forget(self):
+        self._stop_event.set()
+        super().pack_forget()
+
+    def login(self):
+        threading.Thread(target=self.async_login).start()
+
+    def async_login(self, china_account: bool = True):
+        self.login_start_at = time.time()
+        self.login_processing = True
         username = self.username_entry.get()
         password = self.password_entry.get()
         logging.info(f"[login] username: {username}, password: [{password}]")
         logging.info(f"CHINA_ACCOUNT:{china_account}")
         self.master.iService = PyiCloudService(self.master, username, password, china_account)
-        startedAt = time.time()
         while True:
+            dlt = time.time() - self.login_start_at
             if self.master.iService.account.devices:
                 print("登陆成功!")
                 if self.remember_password.get():
-                    self.master.db_cursor.execute("INSERT OR REPLACE INTO users (username, password) VALUES (?, ?)",
-                                                  (username, password))
-                    self.master.db_conn.commit()
-                self.master.show_homepage(username)
+                    # 如果用户勾选了记住密码, 则就保存密码
+                    conn = sqlite3.connect("data.db")
+                    cursor = conn.cursor()
+                    cursor.execute("INSERT OR REPLACE INTO users (username, password) VALUES (?, ?)",
+                                   (username, password))
+                    conn.commit()
                 break
             else:
                 print("还未登陆...")
-                self.message_label.insert(0, f"正在登陆.....{time.time() - startedAt}s")
                 time.sleep(1)
+            # 设置登陆超时
+            max_dlt = 60 * 60 * 60
+            compare_result = dlt > max_dlt
+            print(f"正在登陆.....{dlt}s, 超时:{compare_result}")
+            if compare_result:
+                self.message_label.config(text="登陆超时")
+
+        # 最终
+        self.master.show_homepage(username)
 
     def load_account(self):
         for user in self.users:

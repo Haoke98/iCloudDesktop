@@ -44,7 +44,7 @@ class PyICloudClient(tk.Tk):
         self.page_home.pack_forget()  # 隐藏主页面
         self.reset_size(300, 400)
         self.title("PyICloudClient | 登陆页")
-        self.page_login.pack(expand=True, fill=tk.BOTH)
+        self.page_login.show()
 
     def show_homepage(self, username):
         """
