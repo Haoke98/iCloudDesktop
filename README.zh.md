@@ -145,6 +145,11 @@ api.iphone.location()
     * [ ] [immich-app/immich](https://github.com/immich-app/immich)
     * [ ] [NextCloud](https://github.com/nextcloud)
 
+## 贡献&开发规范
+💡 非常欢迎, 小伙伴们贡献代码来一起维护该仓库❕
+* 贡献巨大的开发者便能获得控制项目发展方向的权限
+* 禁止在主线程进行网络编程
+  
 ## Star History
 
 <a href="https://star-history.com/#haoke98/icloud-killer&Date">

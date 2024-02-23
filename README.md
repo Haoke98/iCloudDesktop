@@ -156,6 +156,12 @@ api.iphone.location()
    * [ ] Support migration to third-party platforms:
      * [ ] [immich-app/immich](https://github.com/immich-app/immich)
      * [ ] [NextCloud](https://github.com/nextcloud)
+
+## Contribution & Development Specifications
+💡 Friends are very welcome to contribute code to maintain the repo together❕
+* Developers who have made significant contributions can gain the authority to control the development direction of the project
+* Prohibit network programming in the main thread
+
 ## Star History
 
 <a href="https://star-history.com/#haoke98/icloud-killer&Date">
