@@ -144,6 +144,12 @@ api.iphone.location()
   * [ ] 支持迁移到第三方平台:
     * [ ] [immich-app/immich](https://github.com/immich-app/immich)
     * [ ] [NextCloud](https://github.com/nextcloud)
+* [ ] 设置菜单
+  * [ ] 查看缓存
+  * [ ] 清理缓存
+  * [ ] 代理设置
+  * [ ] 账号管理
+    * 可以删除已经记住的账号密码
 
 ## 贡献&开发规范
 💡 非常欢迎, 小伙伴们贡献代码来一起维护该仓库❕

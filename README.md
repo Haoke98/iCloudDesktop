@@ -156,6 +156,12 @@ api.iphone.location()
    * [ ] Support migration to third-party platforms:
      * [ ] [immich-app/immich](https://github.com/immich-app/immich)
      * [ ] [NextCloud](https://github.com/nextcloud)
+* [ ] setting menu
+   * [ ] View cache
+   * [ ] Clear cache
+   * [ ] proxy settings
+   * [ ] Account Management
+     * You can delete the remembered account password
 
 ## Contribution & Development Specifications
 💡 Friends are very welcome to contribute code to maintain the repo together❕
