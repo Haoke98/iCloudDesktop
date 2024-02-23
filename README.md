@@ -173,7 +173,7 @@ api.iphone.location()
 </a>
 
 ## Problems:
-
+* Latency problem, there is a short page gap when switching back and forth between the login page and the homepage. (The pack() layout requires a lot of calculations)
 * Missing apple_id field
     * Detailed error message:
       ```shell

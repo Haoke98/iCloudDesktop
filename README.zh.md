@@ -161,6 +161,7 @@ api.iphone.location()
 </a>
 
 ## 存在的问题:
+* 延迟问题,登陆页面和主页之间进行来回切换时出现短暂的页面空档期.(pack()布局需要大量运算导致的)
 * Missing apple_id field
   * 详细报错信息:
     ```shell
