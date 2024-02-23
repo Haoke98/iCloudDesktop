@@ -53,11 +53,11 @@ class PyICloudClient(tk.Tk):
         """
         self.page_login.pack_forget()  # 隐藏登录页面
         self.page_home.show(username)
-        self.reset_size(1200, 600)
+        self.reset_size(1200, 700)
         self.title("PyICloudClient | 登陆页")
 
     def logout(self):
-        self.page_home.destroy()  # 关闭主页窗口
+        self.page_home.pack_forget()  # 关闭主页窗口
         self.show_login_page()
 
 
