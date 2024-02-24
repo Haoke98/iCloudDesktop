@@ -9,13 +9,18 @@
 import datetime
 import json
 import logging
+import os.path
 import threading
 import time
 import tkinter as tk
-from io import BytesIO
 
 import requests
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, UnidentifiedImageError
+
+from lib.mock import mock_images
+from lib import export_frame
+
+MOCK_ACTIVE = True
 
 
 class ScrollableImageGrid(tk.Frame):
@@ -70,6 +75,8 @@ class ScrollableImageGrid(tk.Frame):
 
     def cache_assets_thumb(self):
         createdAt = datetime.datetime.now()
+        if MOCK_ACTIVE:
+            _mock_images = mock_images("Soft", 1, 200, )
         while True:
             dlt = datetime.datetime.now() - createdAt
             if len(self.assets) == 0:
@@ -78,19 +85,52 @@ class ScrollableImageGrid(tk.Frame):
             else:
                 for i, asset_info in enumerate(self.assets):
                     recordName, size, file_type, created, modified, master_record_str, asset_record_str = asset_info
-                    logging.info("{}. {}".format(i, recordName))
                     if not self.assets_caches.__contains__(recordName):
                         master_record = json.loads(master_record_str)
                         asset_record = json.loads(asset_record_str)
                         thumbURL = master_record["fields"]["resJPEGThumbRes"]["value"]["downloadURL"]
+                        cache_dir = os.path.join(".", "caches")
+                        fn = recordName.replace("/", "_") + file_type
+                        if MOCK_ACTIVE:
+                            if i == 200:
+                                _mock_images + mock_images("Soft", (i // 200) + 1, 200)
+                            target = _mock_images[i]
+                            thumbURL = target["url"]
+                            # 对mock数据单独进行缓存π
+                            cache_dir = os.path.join(".", "caches", "mock")
+                            fn = str(target["id"]) + ".jpeg"
+                        logging.info("{}. {} --> {}".format(i, recordName, fn, thumbURL))
+                        if not os.path.exists(cache_dir):
+                            os.makedirs(cache_dir)
+                        fp = os.path.join(cache_dir, fn)
+                        try:
+                            if not os.path.exists(fp):
+                                # 如果没有缓存,则先下载下来先产生缓存
+                                response = requests.get(thumbURL)
+                                contentType = response.headers.get("Content-Type")
 
-                        logging.info("{}. {} --> {}".format(i, recordName, thumbURL))
-                        response = requests.get(thumbURL)
-                        img = Image.open(BytesIO(response.content))
-                        img.thumbnail((100, 100))  # Resize image while preserving aspect ratio
-                        img = ImageTk.PhotoImage(img)
+                                if contentType in ["video/mp4"]:
+                                    video_fp = fp + ".mp4"
+                                    with open(video_fp, "wb") as f:
+                                        f.write(response.content)
+                                    export_frame(video_fp, 1, fp)
+                                else:
+                                    # if contentType in ["image/jpeg", "image/png"]:
+                                    with open(fp, "wb") as f:
+                                        f.write(response.content)
 
-                        self.assets_caches[recordName] = img
+                            # 打开
+                            img = Image.open(fp)
+                            img.thumbnail((100, 100))  # Resize image while preserving aspect ratio
+                            img = ImageTk.PhotoImage(img)
+
+                            self.assets_caches[recordName] = img
+                        except FileNotFoundError as e:
+                            logging.error("Could not find file: {}".format(fp), exc_info=True)
+                        except UnidentifiedImageError as e:
+                            logging.error("FileReadException: {},{}".format(e, response), exc_info=True)
+                        except requests.exceptions.SSLError as e:
+                            logging.error("NetworkException: {}".format(e), exc_info=True)
 
     def update_labels(self):
         epoch_num = 1
@@ -111,7 +151,7 @@ class ScrollableImageGrid(tk.Frame):
                     a += 1
                 else:
                     b += 1
-                    self._add_label(i, self.default_img)
+                    self._add_label(i, None)
             epoch_num += 1
             logging.info("Epoch: {} thumb:{}".format(epoch_num, a))
 
