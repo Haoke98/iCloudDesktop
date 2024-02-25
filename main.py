@@ -9,11 +9,16 @@
 import logging
 import tkinter as tk
 
+import click
+
 from core import init_database
 from lib import logger
 from pages import HomePage, LoginPage
 
 iService = None
+
+MOCK_ACTIVE = False
+MOCK_USERNAME = "demo@mock.com"
 
 
 class PyICloudClient(tk.Tk):
@@ -23,7 +28,7 @@ class PyICloudClient(tk.Tk):
         super().__init__()
         self.iService = None
         self.db_conn, self.db_cursor = init_database()
-        self.page_home = HomePage(self)
+        self.page_home = HomePage(self, MOCK_ACTIVE)
         self.page_login = LoginPage(self)
         self.title("PyICloudClient")
 
@@ -52,6 +57,8 @@ class PyICloudClient(tk.Tk):
         :param username:用户名
         """
         self.page_login.pack_forget()  # 隐藏登录页面
+        if MOCK_ACTIVE:
+            username = MOCK_USERNAME
         self.page_home.show(username)
         self.reset_size(1200, 700)
         self.title("PyICloudClient | 登陆页")
@@ -61,7 +68,15 @@ class PyICloudClient(tk.Tk):
         self.show_login_page()
 
 
-if __name__ == '__main__':
-    logger.init("icloud", console_level=logging.INFO)
+@click.command()
+@click.option("--mock", is_flag=True, default=False, help="Open the mock mode.")
+def main(mock: bool):
+    global MOCK_ACTIVE
+    MOCK_ACTIVE = mock
     app = PyICloudClient()
     app.mainloop()
+
+
+if __name__ == '__main__':
+    logger.init("icloud", console_level=logging.INFO)
+    main()

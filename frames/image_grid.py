@@ -17,16 +17,14 @@ import tkinter as tk
 import requests
 from PIL import Image, ImageTk, UnidentifiedImageError
 
-from lib.mock import mock_images
 from lib import export_frame
-
-MOCK_ACTIVE = True
 
 
 class ScrollableImageGrid(tk.Frame):
     def __init__(self, master, column_num, width=800, height=600, cnf={}, **kw):
         tk.Frame.__init__(self, master, width=width, height=height, cnf=cnf, **kw)
 
+        self.username = None
         self.labels = []
         self.canvas = tk.Canvas(self, width=width, height=height, background="black")
         self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
@@ -70,13 +68,14 @@ class ScrollableImageGrid(tk.Frame):
             label.grid(row=r, column=c, sticky="nsew")
             self.labels.append(label)
 
+    def set_username(self, username: str):
+        self.username = username
+
     def set_data(self, assets: list[slice]):
         self.assets = assets
 
     def cache_assets_thumb(self):
         createdAt = datetime.datetime.now()
-        if MOCK_ACTIVE:
-            _mock_images = mock_images("Soft", 1, 200, )
         while True:
             dlt = datetime.datetime.now() - createdAt
             if len(self.assets) == 0:
@@ -89,16 +88,8 @@ class ScrollableImageGrid(tk.Frame):
                         master_record = json.loads(master_record_str)
                         asset_record = json.loads(asset_record_str)
                         thumbURL = master_record["fields"]["resJPEGThumbRes"]["value"]["downloadURL"]
-                        cache_dir = os.path.join(".", "caches")
+                        cache_dir = os.path.join(".", "caches", self.username)
                         fn = recordName.replace("/", "_") + file_type
-                        if MOCK_ACTIVE:
-                            if i == 200:
-                                _mock_images + mock_images("Soft", (i // 200) + 1, 200)
-                            target = _mock_images[i]
-                            thumbURL = target["url"]
-                            # 对mock数据单独进行缓存π
-                            cache_dir = os.path.join(".", "caches", "mock")
-                            fn = str(target["id"]) + ".jpeg"
                         logging.info("{}. {} --> {}".format(i, recordName, fn, thumbURL))
                         if not os.path.exists(cache_dir):
                             os.makedirs(cache_dir)
@@ -108,12 +99,15 @@ class ScrollableImageGrid(tk.Frame):
                                 # 如果没有缓存,则先下载下来先产生缓存
                                 response = requests.get(thumbURL)
                                 contentType = response.headers.get("Content-Type")
-
-                                if contentType in ["video/mp4"]:
-                                    video_fp = fp + ".mp4"
+                                if contentType.startswith("video/"):
+                                    # video/mp4 video/webm
+                                    extension = contentType[len("video/"):]
+                                    video_fn = recordName + "." + extension
+                                    video_fp = os.path.join(cache_dir, video_fn)
                                     with open(video_fp, "wb") as f:
                                         f.write(response.content)
                                     export_frame(video_fp, 1, fp)
+
                                 else:
                                     # if contentType in ["image/jpeg", "image/png"]:
                                     with open(fp, "wb") as f:
@@ -128,9 +122,12 @@ class ScrollableImageGrid(tk.Frame):
                         except FileNotFoundError as e:
                             logging.error("Could not find file: {}".format(fp), exc_info=True)
                         except UnidentifiedImageError as e:
-                            logging.error("FileReadException: {},{}".format(e, response), exc_info=True)
+                            logging.error("FileReadException: {}".format(e), exc_info=True)
+                            # 可能是因为content
                         except requests.exceptions.SSLError as e:
                             logging.error("NetworkException: {}".format(e), exc_info=True)
+                        except IndexError:
+                            logging.error("indexError: {}".format(i), exc_info=True)
 
     def update_labels(self):
         epoch_num = 1
@@ -152,8 +149,9 @@ class ScrollableImageGrid(tk.Frame):
                 else:
                     b += 1
                     self._add_label(i, None)
-            epoch_num += 1
             logging.info("Epoch: {} thumb:{}".format(epoch_num, a))
+            epoch_num += 1
+            time.sleep(5)
 
     def _on_canvas_configure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))

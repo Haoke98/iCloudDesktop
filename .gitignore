@@ -4,3 +4,4 @@
 /.idea/
 *.log
 data.db
+caches

@@ -14,12 +14,18 @@ import time
 import tkinter as tk
 from tkinter import ttk
 
+from requests.exceptions import SSLError
+
 from frames import ScrollableImageGrid
+from lib import mock
 
 
 class HomePage(tk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, mock_is_active: bool = False):
         super().__init__(master)
+        self.master = master
+        self.mock_is_active = mock_is_active
+        self.username = None
         self.status_message = None
         self.progress_message = None
         self.progress_bar = None
@@ -27,7 +33,6 @@ class HomePage(tk.Frame):
         self.main_block = None
         self.welcome_label = None
         self.image_grid = None
-        self.master = master
         self.create_widgets()
 
     def create_widgets(self):
@@ -78,6 +83,7 @@ class HomePage(tk.Frame):
         pass
 
     def show(self, username):
+        self.username = username
         self.start_sync()
         self.after(1 * 60 * 60, self.show_assets)  # 延迟40秒执行
         self.welcome_label.config(text=f"欢迎回来，{username}！")
@@ -146,12 +152,29 @@ class HomePage(tk.Frame):
         threading.Thread(target=self.async_show).start()
 
     def async_show(self):
-        conn = sqlite3.connect("data.db")
-        cursor = conn.cursor()
+        self.image_grid.set_username(self.username)
+        if self.mock_is_active:
+            _mock_images = []
+        else:
+            conn = sqlite3.connect("data.db")
+            cursor = conn.cursor()
+        n = 1
         while True:
-            cursor.execute(
-                "SELECT recordName, size, file_type,created,modified,master_fields, asset_fields FROM assets ORDER BY created DESC")
-            rows = cursor.fetchall()
+
+            if self.mock_is_active:
+                try:
+                    _mock_images += mock.images(1, 200, "Soft", "Most Comments")
+                    rows = _mock_images
+                    n += 1
+                except SSLError as e:
+                    logging.error("SSL Error: %s", e)
+                    time.sleep(2)
+                    continue
+
+            else:
+                cursor.execute(
+                    "SELECT recordName, size, file_type,created,modified,master_fields, asset_fields FROM assets ORDER BY created DESC")
+                rows = cursor.fetchall()
             logging.debug(f"从数据库提取图片成功!:{len(rows)}")
             self.image_grid.set_data(rows)
             time.sleep(1)
