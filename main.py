@@ -7,7 +7,9 @@
 @disc:
 ======================================="""
 import logging
+import queue
 import tkinter as tk
+from tkinter import simpledialog
 
 import click
 
@@ -28,10 +30,13 @@ class PyICloudClient(tk.Tk):
         super().__init__()
         self.iService = None
         self.db_conn, self.db_cursor = init_database()
+        self.authCodeQueue = queue.Queue()
+
+        # 绑定到主窗口中的某处初始化代码，比如__init__
+        self.bind('<<Request2FA>>', lambda e: self.handle_2fa_request())
         self.page_home = HomePage(self, MOCK_ACTIVE)
         self.page_login = LoginPage(self)
         self.title("PyICloudClient")
-
         self.show_login_page()
 
     def reset_size(self, width: int, height: int):
@@ -66,6 +71,15 @@ class PyICloudClient(tk.Tk):
     def logout(self):
         self.page_home.pack_forget()  # 关闭主页窗口
         self.show_login_page()
+
+    def handle_2fa_request(self):
+        """
+        两步验证处理方法(由于tk的线程不安全性, 必须在主线程上运行)
+        :return:
+        """
+        verification_code = simpledialog.askstring("Two Factor Authentication", "Enter Verification Code:")
+        logging.info("Verification Code: {}".format(verification_code))
+        self.authCodeQueue.put(verification_code)  # Put the user input back into the queue
 
 
 @click.command()

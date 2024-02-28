@@ -79,7 +79,7 @@ class ScrollableImageGrid(tk.Frame):
         while True:
             dlt = datetime.datetime.now() - createdAt
             if len(self.assets) == 0:
-                logging.info("Waiting for assets to be set[{}]....{}".format(len(self.assets), dlt))
+                logging.debug("Waiting for assets to be set[{}]....{}".format(len(self.assets), dlt))
                 time.sleep(2)
             else:
                 for i, asset_info in enumerate(self.assets):
@@ -137,7 +137,7 @@ class ScrollableImageGrid(tk.Frame):
             b = 0
             if len(self.assets) == 0:
                 dlt = datetime.datetime.now() - createdAt
-                logging.info("Waiting for assets to be set....{} ".format(dlt))
+                logging.debug("Waiting for assets to be set....{} ".format(dlt))
                 time.sleep(5)
                 continue
             for i, asset_info in enumerate(self.assets):

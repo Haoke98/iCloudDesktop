@@ -93,7 +93,7 @@ class LoginPage(tk.Frame):
                 # 设置登陆超时
                 max_dlt = 60 * 60 * 60
                 compare_result = dlt > max_dlt
-                print(f"正在登陆.....{dlt}s, 超时:{compare_result}")
+                # logging.debug(f"正在登陆.....{dlt}s, 超时:{compare_result}")
         self.message_label.config(text="")
 
     def show(self):

@@ -32,6 +32,7 @@ class PyiCloudService(__iCloudService__):
                  verify=True,
                  client_id=None,
                  with_family=True, ):
+        self.tk_ctx = tk_ctx
         if china_account:
             self.HOME_ENDPOINT = "https://www.icloud.com.cn"
             self.SETUP_ENDPOINT = "https://setup.icloud.com.cn/setup/ws/1"
@@ -42,8 +43,12 @@ class PyiCloudService(__iCloudService__):
     def two_factor_authenticate(self):
         if self.requires_2fa:
             logging.warning("Two-factor authentication required.")
-            # 第一步：向用户请求输入第一个验证代码
-            verification_code = simpledialog.askstring("Two Factor Authentication", "Enter Verification Code 1:")
+            # 第一步：向用户请求输入第一个验证代码 (由于tk的线程不安全性, 必须在主线程上运行, 所以需要用线程通信和间接触发的形式转交给主线程处理)
+            # 使用主线程的方法来获取用户输入
+            self.tk_ctx.event_generate('<<Request2FA>>', when="tail")
+            # 等待用户输入的结果
+            verification_code = self.tk_ctx.authCodeQueue.get()  # This will block until the item is available
+            logging.info("Verification Code: {}".format(verification_code))
             result = self.validate_2fa_code(verification_code)
             logging.info("Code validation result: %s" % result)
 
