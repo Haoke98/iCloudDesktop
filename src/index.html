@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+
+<style>
+    #response-container {
+        display: none;
+        padding: 1rem;
+        margin: 3rem 5%;
+        font-size: 120%;
+        border: 5px dashed #ccc;
+        word-wrap: break-word;
+    }
+
+    label {
+        margin-left: 0.3rem;
+        margin-right: 0.3rem;
+    }
+
+    button {
+        font-size: 100%;
+        padding: 0.5rem;
+        margin: 0.3rem;
+        text-transform: uppercase;
+    }
+
+</style>
+</head>
+<script type="importmap">
+  {
+    "imports": {
+      "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+    }
+  }
+</script>
+<body>
+<h1>iCloud Desktop</h1>
+<div id="app">{{ message }}</div>
+<button onclick='window.pywebview.api.log(\"Woah dude!\")'>Click me</button>
+<p id='pywebview-status'><i>pywebview</i> is not ready</p>
+
+<button onClick="initialize()">Hello Python</button><br/>
+<button id="heavy-stuff-btn" onClick="doHeavyStuff()">Perform a heavy operation</button><br/>
+<button onClick="getRandomNumber()">Get a random number</button><br/>
+<label for="username">Username:</label><input id="username" placeholder="input your username here.">
+<label for="password">Password:</label><input id="password" placeholder="input your password here.">
+<button onClick="greet()">Greet</button><br/>
+<button onClick="catchException()">Catch Exception</button><br/>
+
+<div id="response-container"></div>
+<script src="js/index.js" type="application/javascript"></script>
+<script type="module">
+  import { createApp } from 'vue'
+
+  createApp({
+    data() {
+      return {
+        message: 'Hello Vue!'
+      }
+    }
+  }).mount('#app')
+</script>
+</body>
+</html>
