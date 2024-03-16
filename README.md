@@ -1,4 +1,4 @@
-# <cite>iCloud Console</cite>
+# <cite>iCloud Desktop</cite>
 
 <p align="center">
     <img width="300" src="assets/41166dada6559cb93c7a4ff0ea681e52.png">
