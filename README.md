@@ -14,6 +14,11 @@ English | [简体中文](README.zh.md)
 |         *Preview of home page and interactions*          |                    *Preview of login page*                     |
 
 
+### 相关项目
+
+* 🚀 [iCloudSDK](https://github.com/Haoke98/iCloudSDK) 是一个基于Python的icloud通用API调用SDK依赖库.任何一个python项目导入便可使用.
+* ☘️  [iCloudDjango](https://github.com/Haoke98/iCloudDjango) 是一个DjangoApp, 在任何一个Django项目中导入便可使用.
+
 ## Usage
 
 ```shell
