@@ -183,6 +183,13 @@ api.iphone.location()
   </picture>
 </a>
 
+## 联系我们
+* QQ邮箱：1903249375@qq.com
+
+<img width="280" src="https://github.com/user-attachments/assets/b8f1d843-1683-4396-b880-35870d07ab51" />
+
+
+
 ## Problems:
 * Latency problem, there is a short page gap when switching back and forth between the login page and the homepage. (The pack() layout requires a lot of calculations)
 * Missing apple_id field
